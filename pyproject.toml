@@ -1,0 +1,31 @@
+[project]
+name = "sea-level-monitoring"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cdsapi>=0.7.7",
+    "duckdb>=1.5.1",
+    "earthkit>=0.13.2",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.4",
+    "pandas>=2.3.3",
+    "pyarrow>=23.0.1",
+    "xarray>=2026.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "bpython>=0.26",
+    "catppuccin-jupyterlab>=0.2.4",
+    "catppuccin[pygments]>=2.5.0",
+    "ipython>=9.10.1",
+    "ipywidgets>=8.1.8",
+    "jupyter>=1.1.1",
+    "jupyter-lsp>=2.3.1",
+    "jupyterlab>=4.5.6",
+    "jupyterlab-lsp>=5.3.0",
+    "jupyterlab-pygments>=0.3.0",
+    "python-lsp-server[all]>=1.14.0",
+]
