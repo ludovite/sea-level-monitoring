@@ -2063,6 +2063,17 @@ wheels = [
 ]
 
 [[package]]
+name = "jupyter-viewer"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jupyter-server" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/09/00/55438505284b392edd080b3e773eefd98d5291a90ff18e64c06658476d3b/jupyter_viewer-1.0.3-py3-none-any.whl", hash = "sha256:654d7bbddb689b4b9a78d7e7895e13b0b0228c99103e01f0ccaf1582353f7f48", size = 9096782, upload-time = "2025-12-30T17:20:36.667Z" },
+]
+
+[[package]]
 name = "jupyterlab"
 version = "4.5.6"
 source = { registry = "https://pypi.org/simple" }
@@ -4435,6 +4446,7 @@ dev = [
     { name = "ipywidgets" },
     { name = "jupyter" },
     { name = "jupyter-lsp" },
+    { name = "jupyter-viewer" },
     { name = "jupyterlab" },
     { name = "jupyterlab-lsp" },
     { name = "jupyterlab-pygments" },
@@ -4462,6 +4474,7 @@ dev = [
     { name = "ipywidgets", specifier = ">=8.1.8" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "jupyter-lsp", specifier = ">=2.3.1" },
+    { name = "jupyter-viewer", specifier = ">=1.0.3" },
     { name = "jupyterlab", specifier = ">=4.5.6" },
     { name = "jupyterlab-lsp", specifier = ">=5.3.0" },
     { name = "jupyterlab-pygments", specifier = ">=0.3.0" },
