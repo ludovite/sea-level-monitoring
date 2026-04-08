@@ -9,6 +9,7 @@ dependencies = [
     "duckdb>=1.5.1",
     "earthkit>=0.13.2",
     "matplotlib>=3.10.8",
+    "netcdf4>=1.7.4",
     "numpy>=2.4.4",
     "pandas>=2.3.3",
     "pyarrow>=23.0.1",
