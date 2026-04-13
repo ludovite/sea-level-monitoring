@@ -90,7 +90,7 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ## Step 1 − Initialise Database
+    ## Step 1 − Initialize Database
     """)
     return
 
@@ -112,6 +112,177 @@ def _():
         if db_file.exists()
         else "   (new database)"
     )
+    return (conn,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Step 2 − Populate `sea_level_monthly` table
+    """)
+    return
+
+
+@app.cell
+def _(conn):
+    # Create table from Parquet file
+    print("📥 Loading Parquet data into DuckDB…\n")
+
+    parquet_file = data_dir / 'sea_level_data.parquet'
+
+    try:
+        # SQL command to create table from parquet
+        create_table_sql = f"""
+        CREATE TABLE sea_level_monthly AS
+        SELECT * FROM read_parquet('{parquet_file}')
+        """
+    
+        conn.execute(create_table_sql)
+    
+        # Get table info
+        result = conn.execute(
+            "SELECT COUNT(*) as row_count FROM sea_level_monthly"
+        ).fetchall()
+        row_count = result[0][0]
+    
+        print(f"✅ Table created: sea_level_monthly")
+        print(f"   Rows: {row_count:,}")
+        print(f"\n📊 Table schema:")
+        schema = conn.execute(
+            "DESCRIBE sea_level_monthly"
+        ).fetchall()
+        for col_name, col_type, *rest in schema:
+            print(f"   • {col_name}: {col_type}")
+        
+    except Exception as e:
+        print(f"⚠️  Table might already exist. Recreating...")
+        conn.execute(
+            "DROP TABLE IF EXISTS sea_level_monthly"
+        )
+        create_table_sql = f"""
+        CREATE TABLE sea_level_monthly AS
+        SELECT * FROM read_parquet('{parquet_file}')
+        """
+        conn.execute(create_table_sql)
+        print(f"✅ Table recreated: sea_level_monthly")
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Step 3 − Query examples
+    """)
+    return
+
+
+@app.cell
+def _(conn):
+    # Example 1: Global statistics by year
+    print("📊 Query 1: Global Mean Sea Level Anomaly by Year\n")
+
+    query1 = """
+    SELECT
+        year,
+        COUNT(*) as measurements,
+        AVG(sea_level_anomaly_m) as mean_anomaly_m,
+        MIN(sea_level_anomaly_m) as min_anomaly_m,
+        MAX(sea_level_anomaly_m) as max_anomaly_m,
+        STDDEV(sea_level_anomaly_m) as std_dev_m
+    FROM sea_level_monthly
+    GROUP BY year
+    ORDER BY year
+    """
+
+    result1 = conn.execute(query1).fetchall()
+    df_result1 = conn.execute(query1).df()
+    print(df_result1.to_string(index=False))
+    return
+
+
+@app.cell
+def _(conn):
+    # Example 2: Highest and lowest sea level anomaly locations
+    print("\n📊 Query 2: Locations with Extreme Sea Level Anomalies (Latest Month)\n")
+
+    query2_high = """
+    WITH latest AS (
+        SELECT *
+        FROM sea_level_monthly
+        WHERE timestamp = (SELECT MAX(timestamp) FROM sea_level_monthly)
+    ),
+    ranked AS (
+        SELECT
+            latitude,
+            longitude,
+            sea_level_anomaly_m,
+            timestamp,
+            ROW_NUMBER() OVER (ORDER BY sea_level_anomaly_m DESC) AS rank_high,
+            ROW_NUMBER() OVER (ORDER BY sea_level_anomaly_m ASC)  AS rank_low
+        FROM latest
+    )
+    SELECT
+        CASE
+            WHEN rank_high <= 5 THEN 'Highest'
+            ELSE 'Lowest'
+        END AS anomaly_type,
+        latitude,
+        longitude,
+        sea_level_anomaly_m,
+        timestamp
+    FROM ranked
+    WHERE rank_high <= 5 OR rank_low <= 5
+    ORDER BY anomaly_type, sea_level_anomaly_m DESC;
+    """
+    # SELECT
+    #     'Highest' as anomaly_type,
+    #     latitude,
+    #     longitude,
+    #     sea_level_anomaly_m,
+    #     timestamp
+    # FROM sea_level_monthly
+    # WHERE timestamp = (SELECT MAX(timestamp) FROM sea_level_monthly)
+    # ORDER BY sea_level_anomaly_m DESC
+    # LIMIT 5
+    # UNION ALL
+    # SELECT
+    #     'Lowest' as anomaly_type,
+    #     latitude,
+    #     longitude,
+    #     sea_level_anomaly_m,
+    #     timestamp
+    # FROM sea_level_monthly
+    # WHERE timestamp = (SELECT MAX(timestamp) FROM sea_level_monthly)
+    # ORDER BY sea_level_anomaly_m ASC
+    # LIMIT 5
+    # """
+
+    df_result2 = conn.execute(query2_high).df()
+    print(df_result2.to_string(index=False))
+    return
+
+
+@app.cell
+def _(conn):
+    # Example 3: Regional analysis (choose a region)
+    print("\n📊 Query 3: Mediterranean Sea Region (Sample)\n")
+
+    # Mediterranean bounds: roughly 30-45°N, -6-42°E
+    query3 = """
+    SELECT
+        timestamp,
+        ROUND(AVG(sea_level_anomaly_m), 4) as mean_anomaly_m,
+        COUNT(*) as grid_points
+    FROM sea_level_monthly
+    WHERE latitude BETWEEN 30 AND 45
+      AND longitude BETWEEN -6 AND 42
+    GROUP BY timestamp
+    ORDER BY timestamp DESC
+    LIMIT 12
+    """
+
+    df_result3 = conn.execute(query3).df()
+    print(df_result3.to_string(index=False))
     return
 
 
