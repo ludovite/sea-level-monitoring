@@ -9,9 +9,10 @@ wheels/
 # Virtual environments
 .venv
 
-# Jupyter
+# Notebooks
 .ipynb_checkpoints/
 .virtual_documents/
+__marimo__/
 
 # Data folders
 data/
