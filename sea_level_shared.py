@@ -36,7 +36,7 @@ Shared variables
 #     mpl.style.use(catppuccin.PALETTE.macchiato.identifier)
 #
 #
-# # Project librairy
+# # Project library
 # # ================
 # # Shared variables
 # from sea_level_shared import (
@@ -78,3 +78,10 @@ cds_config_path = Path.home() / ".cdsapirc"
 # Dataset Name
 # ============
 dataset_name = "satellite-sea-level-global"
+
+# Sea Surface Temperature (SST) dataset
+# =====================================
+sst_dataset_name = "satellite-sea-surface-temperature"
+sst_zip_file = data_dir / "sst_data.zip"
+sst_nc_dir = data_dir / "sst_nc"
+sst_nc_dir.mkdir(parents=True, exist_ok=True)
