@@ -108,14 +108,19 @@ def _(ds_sst_regridded):
     df = df.rename(columns={"analysed_sst": "sst_celsius"})
 
     # Clé temporelle commune avec sea level
-    df["year_month"] = df["time"].dt.strftime("%Y-%m")
+    # df["year_month"] = df["time"].dt.strftime("%Y-%m")
+    df["year"] = df["time"].dt.year
+    df["month"] = df["time"].dt.month
 
     # Réordonner les colonnes
-    df = df[["year_month", "time", "latitude", "longitude",
-             "sst_celsius", "sea_ice_fraction"]]
+    # df = df[["year_month", "time", "latitude", "longitude",
+    #          "sst_celsius", "sea_ice_fraction"]]
+    df = df[["year", "month", "latitude", "longitude", "sst_celsius", "sea_ice_fraction"]]
 
     print(f"📊 Rows: {len(df):,}")
-    print(f"📅 Period: {df['year_month'].min()} → {df['year_month'].max()}")
+    print("📅 Period: ",
+          f"{df['month'].min():02d}/{df['year'].min()} → ",
+          f"{df['month'].max():02d}/{df['year'].max()}")
     print(df.head())
     print(f"\nMemory: {df.memory_usage(deep=True).sum() / 1024**2:.1f} MiB")
 
